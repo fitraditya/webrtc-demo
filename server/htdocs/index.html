@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>WebRTC Demo</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css">
+    <style>
+    body {
+        padding-top: 70px;
+        padding-bottom: 30px;
+    }
+    .theme-showcase .navbar .container {
+        width: auto;
+    }    .theme-showcase > p > .btn {
+        margin: 5px 0;
+    }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">WebRTC Demo</a>
+            </div>
+        </div>
+    </nav>
+    <div class="container theme-showcase" role="main">
+        <div class="row">
+            <div class="col-md-8">
+                <div class="embed-responsive embed-responsive-16by9">
+                    <video id="remote" autoplay playsinline>Your browser doesn't support video</video>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <p>Our ID is <b id="peer-id">Unknown</b></p>
+                <div class="embed-responsive embed-responsive-16by9">
+                    <video id="local" autoplay playsinline>Your browser doesn't support video</video>
+                </div>
+                <p>Status: <span id="status">Unknown</span></p>
+                <textarea class="form-control" id="text"></textarea>
+            </div>
+        </div>
+    </div>
+    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+    <script src="webrtc.js"></script>
+    <script>
+        window.onload = connect();
+    </script>
+</body>
+
+</html>

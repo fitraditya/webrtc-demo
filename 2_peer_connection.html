@@ -1,0 +1,111 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1, maximum-scale=1">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta id="theme-color" name="theme-color" content="#ffffff">
+    <title>Peer Connection</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div id="container">
+        <h1>Peer Connection</h1>
+        <video class="video-box video-local" id="video-local" playsinline autoplay muted></video>
+        <video class="video-box video-remote" id="video-remote" playsinline autoplay></video>
+        <div class="box">
+            <button id="open-camera">Open Camera</button>
+            <button id="call">Call</button>
+        </div>
+    </div>
+    <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+    <script>
+        var video;
+
+        function openCamera() {
+            var constraints = { video: true, audio: true };
+            if (navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia(constraints)
+                .then(function(stream) {
+                    document.getElementById('video-local').srcObject = stream;
+                    video = stream;
+                }).catch(function(error) {
+                    alert('ERROR: ', error);
+                });
+            } else {
+                alert('ERROR: Browser does not support getUserMedia');
+            }
+        };
+        function createPeerConnection() {
+            var pc1 = new RTCPeerConnection();
+            var pc2 = new RTCPeerConnection();
+            pc1.addStream(video);
+            pc1.createOffer()
+            .then(function(offer) {
+                console.log('Got local description: ' + JSON.stringify(offer));
+                pc1.setLocalDescription(offer)
+                .then(function() {
+                    pc2.setRemoteDescription(offer)
+                    .then(function() {
+                        pc2.createAnswer()
+                        .then(function(answer) {
+                            console.log('Got local description: ' + JSON.stringify(answer));
+                            pc2.setLocalDescription(answer)
+                            .then(function() {
+                                pc1.setRemoteDescription(answer);
+                            }).catch(function(error) {
+                                alert('ERROR: ', error);
+                            });
+                        }).catch(function(error) {
+                            alert('ERROR: ', error);
+                        });
+                    }).catch(function(error) {
+                        alert('ERROR: ', error);
+                    });
+                }).catch(function(error) {
+                    alert('ERROR: ', error);
+                });
+            }).catch(function(error) {
+                alert('ERROR: ', error);
+            });
+            pc1.onicecandidate = function(event) {
+                if (event.candidate == null) {
+                    return;
+                }
+
+                console.log(event)
+                var candidate = new RTCIceCandidate(event.candidate);
+                console.log(candidate)
+                pc2.addIceCandidate(candidate).catch(function(error) {
+                    alert('ERROR: ', error);
+                });
+            };
+            pc2.onicecandidate = function(event) {
+                if (event.candidate == null) {
+                    return;
+                }
+
+                console.log(event)
+                var candidate = new RTCIceCandidate(event.candidate);
+                console.log(candidate)
+                pc1.addIceCandidate(candidate).catch(function(error) {
+                    alert('ERROR: ', error);
+                });
+            };
+            pc2.ontrack = function(event) {
+                if (document.getElementById('video-remote').srcObject !== event.streams[0]) {
+                    document.getElementById('video-remote').srcObject = event.streams[0];
+                }
+            };
+        }
+        document.getElementById('open-camera').addEventListener('click', function() {
+            openCamera();
+        });
+        document.getElementById('call').addEventListener('click', function() {
+            createPeerConnection();
+        });
+    </script>
+</body>
+
+</html>
